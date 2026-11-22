@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111111'/%3E%3Cpath d='M32 15 L53 24.5 L32 34 L11 24.5 Z' fill='none' stroke='%23ffffff' stroke-width='3.5' stroke-linejoin='round'/%3E%3Cpath d='M21 30 V40 C21 44.5 43 44.5 43 40 V30' fill='none' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3Cpath d='M49 27 V40' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3Ccircle cx='49' cy='43.5' r='2.5' fill='%23ffffff'/%3E%3C/svg%3E"/>
+    <title>智小港 - 管理端</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css(v='20261025n1')}">
+    <link rel="stylesheet" th:href="@{/css/admin-home.css(v='20261120b')}">
+    <link rel="stylesheet" th:href="@{/css/ui-feedback.css(v='20261120a')}">
+    <script th:src="@{/js/csrf.js(v='20261121a')}"></script>
+    <script th:src="@{/js/auth-guard.js(v='20260927w')}"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>智小港管理端</h1>
+            <div class="user-info">
+                <div class="user-avatar" th:text="${user.name.substring(0, 1)}">管</div>
+                <div class="user-meta">
+                    <div class="user-name" th:text="${user.name}">管理员</div>
+                    <div class="user-role">管理端</div>
+                </div>
+                <button class="logout-btn" onclick="confirmLogout('/admin/logout')">退出登录</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <aside class="sidebar">
+            <div class="sidebar-title">功能菜单</div>
+            <nav class="sidebar-menu">
+                <button class="sidebar-item active" onclick="showPage('dashboard')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>数据概览</button>
+                <button class="sidebar-item" onclick="showPage('semesterSetting')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 3v3M14 3v3M5 18l2 2 4-4M17 16l2-2-2-2"/></svg>学期设置</button>
+                <button class="sidebar-item" onclick="showPage('users')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>用户列表</button>
+                <button class="sidebar-item" onclick="showPage('classrooms')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-5h6v5"/><path d="M8 7h.01M16 7h.01M8 11h.01M16 11h.01"/></svg>教室列表</button>
+                <button class="sidebar-item" onclick="showPage('classSchedule')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><rect x="7" y="13" width="3" height="3"/><rect x="14" y="13" width="3" height="3"/><rect x="7" y="17" width="3" height="3"/><rect x="14" y="17" width="3" height="3"/></svg>教室课表</button>
+                <button class="sidebar-item" onclick="showPage('aiSchedule')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>AI 自动排课</button>
+                <button class="sidebar-item" onclick="showPage('adjustments')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"/><rect x="8" y="1" width="8" height="4" rx="1"/><path d="M8 11h8"/><path d="M8 15h5"/><path d="M15.5 17.5l2 2 4-4"/></svg>调课审批</button>
+                <button class="sidebar-item" onclick="showPage('notifications')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>通知管理</button>
+                <button class="sidebar-item" onclick="showPage('classes')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="M12 16v5"/><path d="M8 21h8"/></svg>班级管理</button>
+                <button class="sidebar-item" onclick="showPage('reservations')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>预约审核</button>
+                <button class="sidebar-item" onclick="showPage('aiConfig')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>模型提供商</button>
+                <button class="sidebar-item" onclick="showPage('operationLogs')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/></svg>操作日志</button>
+            </nav>
+        </aside>
+
+        <main class="content-area">
+            <div id="dashboardPage" class="page-card">
+                <p class="eyebrow">Dashboard · 概览</p>
+                <h2>数据概览</h2>
+                <div class="dashboard-cards">
+                    <div class="dashboard-card">
+                        <div class="number" id="totalUsers">—</div>
+                        <div class="label">总用户数</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="number" id="totalClassrooms">—</div>
+                        <div class="label">教室数量</div>
+                    </div>
+                    <div class="dashboard-card clickable" onclick="openPageFromCard('reservations')" title="查看预约审核">
+                        <div class="number" id="pendingReservations">—</div>
+                        <div class="label">待审核教室预约</div>
+                        <div class="card-hint">点击查看 →</div>
+                    </div>
+                    <div class="dashboard-card clickable" onclick="openPageFromCard('adjustments')" title="查看调课审批">
+                        <div class="number" id="pendingAdjustments">—</div>
+                        <div class="label">待审核调课</div>
+                        <div class="card-hint">点击查看 →</div>
+                    </div>
+                </div>
+                <div id="dashboardLoadError" style="display:none;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border:1px solid #e8b4ae;background:#fdf0ef;border-radius:8px;color:#c0392b;font-size:13px;">
+                    <span>概览数据加载失败，请检查网络后重试。</span>
+                    <button class="action-btn" type="button" onclick="loadDashboard()">重试</button>
+                </div>
+                <div class="ai-toggle-bar">
+                    <button class="action-btn delete" onclick="toggleAI()" id="aiToggleBtn">断开智能AI</button>
+                    <span id="aiStatusText">智能AI状态：运行中</span>
+                </div>
+            </div>
+
+            <div id="aiConfigPage" class="page-card" style="display:none;">
+                <div class="provider-page-head">
+                    <div>
+                        <p class="eyebrow">AI Providers · 模型</p>
+                        <h2>模型提供商管理</h2>
+                    </div>
+                    <button class="provider-add-btn" onclick="openProviderModal()">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                        新增提供商
+                    </button>
+                </div>
+
+                <div class="active-provider-bar" id="activeProviderBar">
+                    <div class="active-provider-info">
+                        <span class="active-provider-label">当前生效</span>
+                        <span class="active-provider-name" id="activeProviderText">加载中...</span>
+                    </div>
+                    <button class="active-refresh-btn" onclick="loadProviders()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+                        刷新
+                    </button>
+                </div>
+
+                <div id="providerKeyNotice" style="display:none;margin:12px 0;padding:10px 14px;border:1px solid #f0c36d;background:#fff8e6;color:#8a5a00;border-radius:8px;font-size:13px;line-height:1.6;">
+                    当前未配置加密密钥（环境变量 AI_KEY_SECRET），API Key 以明文存储。配置后重新保存即可自动加密。
+                </div>
+
+                <div class="provider-grid" id="providerGrid"></div>
+            </div>
+
+            <div id="semesterSettingPage" class="page-card" style="display:none;">
+                <p class="eyebrow">Semester · 学期</p>
+                <h2>学期设置</h2>
+                <div class="semester-setting-card">
+                    <div class="form-group" style="margin-bottom:16px;">
+                        <label style="display:block;font-size:13px;color:#666666;margin-bottom:6px;">学期名称</label>
+                        <input type="text" id="semesterName" placeholder="如 2026-2027 学年第一学期" maxlength="128">
+                    </div>
+                    <div class="form-group" style="margin-bottom:16px;">
+                        <label style="display:block;font-size:13px;color:#666666;margin-bottom:6px;">开始日期</label>
+                        <input type="date" id="semesterStartDate">
+                    </div>
+                    <div class="form-group" style="margin-bottom:16px;">
+                        <label style="display:block;font-size:13px;color:#666666;margin-bottom:6px;">持续周数</label>
+                        <input type="number" id="semesterWeeks" min="1" max="40" placeholder="请输入 1-40 周">
+                    </div>
+                    <div class="semester-preview" id="semesterPreview" style="display:none;background:#f5f5f5;padding:16px;border-radius:8px;margin-bottom:20px;">
+                        <p style="font-size:14px;color:#111111;margin:0 0 8px 0;font-weight:500;">该学期将于 <span id="previewEndDate"></span> 结束，共 <span id="previewTotalWeeks"></span> 周</p>
+                        <p style="font-size:13px;color:#666666;margin:0;">开始日期所在周视为第 1 周，每周从周一开始计算。</p>
+                    </div>
+                    <div class="form-result" id="semesterResult" style="display:none;"></div>
+                    <button class="primary-btn" style="margin-top:8px;" onclick="saveSemesterConfig()">保存学期配置</button>
+                </div>
+            </div>
+
+            <div id="usersPage" class="page-card" style="display:none;">
+                <p class="eyebrow">Users · 用户</p>
+                <h2>用户管理</h2>
+                <div class="search-bar">
+                    <input type="text" id="userSearch" placeholder="搜索学号或姓名...">
+                    <button onclick="filterUsers()">搜索</button>
+                </div>
+                <div class="filter-bar">
+                    <select id="filterDepartment" onchange="filterUsers()">
+                        <option value="">全部学院</option>
+                        <option value="人工智能学院">人工智能学院</option>
+                        <option value="经济管理学院">经济管理学院</option>
+                        <option value="建筑工程学院">建筑工程学院</option>
+                        <option value="商学院">商学院</option>
+                        <option value="信息学院">信息学院</option>
+                        <option value="艺术学院">艺术学院</option>
+                        <option value="其他">其他</option>
+                    </select>
+                    <select id="filterGrade" onchange="filterUsers()">
+                        <option value="">全部年级</option>
+                        <option value="2024">2024级</option>
+                        <option value="2025">2025级</option>
+                        <option value="2026">2026级</option>
+                        <option value="2027">2027级</option>
+                    </select>
+                    <select id="filterMajor" onchange="filterUsers()">
+                        <option value="">全部专业</option>
+                        <option value="计算机应用技术">计算机应用技术</option>
+                        <option value="软件技术">软件技术</option>
+                        <option value="计算机网络技术">计算机网络技术</option>
+                        <option value="人工智能">人工智能</option>
+                        <option value="软件工程">软件工程</option>
+                        <option value="会计">会计</option>
+                        <option value="市场营销">市场营销</option>
+                        <option value="建筑工程技术">建筑工程技术</option>
+                        <option value="其他">其他</option>
+                    </select>
+                    <button onclick="resetFilters()">重置筛选</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>学号</th>
+                                <th>姓名</th>
+                                <th>角色</th>
+                                <th>学院</th>
+                                <th>专业</th>
+                                <th>年级</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="userPager" class="ui-pager"></div>
+            </div>
+
+            <div id="classroomsPage" class="page-card" style="display:none;">
+                <p class="eyebrow">Classrooms · 教室</p>
+                <h2>教室管理</h2>
+                <div class="search-bar">
+                    <input type="text" id="classroomSearch" placeholder="搜索教室号或楼栋..." onkeyup="filterClassrooms()">
+                    <button onclick="filterClassrooms()">搜索</button>
+                    <button onclick="openAddClassroom()">新增教室</button>
+                </div>
+                <div class="filter-bar">
+                    <select id="filterBuilding" onchange="filterClassrooms()">
+                        <option value="">全部楼栋</option>
+                        <option th:each="b : ${buildings}" th:value="${b}"
+                                th:text="${b.endsWith('馆') ? b : b + '教学楼'}"></option>
+                    </select>
+                    <select id="filterRoomType" onchange="filterClassrooms()">
+                        <option value="">全部教室类型</option>
+                    </select>
+                    <select id="filterClassroomStatus" onchange="filterClassrooms()">
+                        <option value="">全部状态</option>
+                        <option value="available">可用</option>
+                        <option value="occupied">占用</option>
+                        <option value="maintenance">维修中</option>
+                    </select>
+                    <button onclick="resetClassroomFilters()">重置筛选</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>教室号</th>
+                                <th>楼栋</th>
+                                <th>容量</th>
+                                <th>教室类型</th>
+                                <th>状态</th>
+                                <th>本周占用</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="classroomTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="classSchedulePage" class="page-card" style="display:none;">
+                <p class="eyebrow">Class Schedule · 教室课表</p>
+                <h2>教室课表</h2>
+                <div class="cs-toolbar">
+                    <div class="cs-filter">
+                        <label for="acsClassroomSelect">选择教室：</label>
+                        <select id="acsClassroomSelect" onchange="loadAdminClassSchedule()"></select>
+                    </div>
+                    <div class="cs-filter">
+                        <label for="acsWeekSelect">选择周次：</label>
+                        <select id="acsWeekSelect" onchange="loadAdminClassSchedule()">
+                            <option value="">全部</option>
+                            <option value="1">第 1 周</option>
+                            <option value="2">第 2 周</option>
+                            <option value="3">第 3 周</option>
+                            <option value="4">第 4 周</option>
+                            <option value="5">第 5 周</option>
+                            <option value="6">第 6 周</option>
+                            <option value="7">第 7 周</option>
+                            <option value="8">第 8 周</option>
+                            <option value="9">第 9 周</option>
+                            <option value="10">第 10 周</option>
+                            <option value="11">第 11 周</option>
+                            <option value="12">第 12 周</option>
+                            <option value="13">第 13 周</option>
+                            <option value="14">第 14 周</option>
+                            <option value="15">第 15 周</option>
+                            <option value="16">第 16 周</option>
+                            <option value="17">第 17 周</option>
+                            <option value="18">第 18 周</option>
+                            <option value="19">第 19 周</option>
+                            <option value="20">第 20 周</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="acsMatrixWrap">
+                    <p class="empty-hint">加载中...</p>
+                </div>
+            </div>
+
+            <div id="aiSchedulePage" class="page-card" style="display:none;">
+                <p class="eyebrow">AI Schedule · 自动排课</p>
+                <h2>AI 自动排课</h2>
+                <p class="page-note">预览确认后才写入课表，未确认不写入任何数据。</p>
+
+                <div class="as-req-bar">
+                    <div class="as-req-bar-left">
+                        <span class="as-req-bar-title">教师已提交排课要求</span>
+                        <span class="as-req-badge" id="asReqBadge" style="display:none;">0</span>
+                        <span class="as-hint">审核通过后可在第 3 步「已审核通过的排课约束」中一键导入。</span>
+                    </div>
+                    <div class="as-req-bar-actions">
+                        <button class="action-btn edit as-btn-sm" onclick="asOpenConstraintRequests()">查看待处理要求</button>
+                    </div>
+                </div>
+
+                <ol class="as-steps" id="asSteps">
+                    <li class="as-step" data-step="1"><span class="as-step-no">1</span>选班级</li>
+                    <li class="as-step" data-step="2"><span class="as-step-no">2</span>课程清单</li>
+                    <li class="as-step" data-step="3"><span class="as-step-no">3</span>时间与约束</li>
+                    <li class="as-step" data-step="4"><span class="as-step-no">4</span>预览确认</li>
+                </ol>
+
+                <section class="as-panel" id="asPanel1">
+                    <h3 class="section-title">1. 选择班级与排课模式</h3>
+                    <div class="as-grid">
+                        <div class="as-field">
+                            <label>排课模式</label>
+                            <div class="as-radio-row">
+                                <label class="as-radio"><input type="radio" name="asMode" value="single" checked onchange="asOnModeChange()"> 单个班级排课</label>
+                                <label class="as-radio"><input type="radio" name="asMode" value="semester" onchange="asOnModeChange()"> 整学期排课（多班级）</label>
+                            </div>
+                        </div>
+                        <div class="as-field">
+                            <label>学期</label>
+                            <input type="text" id="asSemester" class="user-field" value="2026-2027-1" style="max-width:240px;">
+                        </div>
+                    </div>
+                    <div class="as-field">
+                        <label>选择班级 <span class="as-hint" id="asClassHint">（单个班级模式仅取勾选的一个班级）</span></label>
+                        <div id="asClassList" class="as-check-list"><p class="empty-hint">加载中...</p></div>
+                    </div>
+                    <div class="as-actions">
+                        <button class="action-btn edit" onclick="asGoStep(2)">下一步：课程清单</button>
+                    </div>
+                </section>
+
+                <section class="as-panel" id="asPanel2" style="display:none;">
+                    <h3 class="section-title">2. 导入 / 设置课程清单</h3>
+                    <div class="as-source-tabs">
+                        <button class="as-tab active" data-source="library" onclick="asSwitchSource('library')">从课程库选择</button>
+                        <button class="as-tab" data-source="text" onclick="asSwitchSource('text')">自然文字解析</button>
+                        <button class="as-tab" data-source="excel" onclick="asSwitchSource('excel')">Excel 导入</button>
+                        <button class="as-tab" id="asTabImage" data-source="image" onclick="asSwitchSource('image')">图片导入</button>
+                    </div>
+
+                    <div class="as-source" id="asSourceLibrary">
+                        <div class="as-actions-inline">
+                            <button class="action-btn edit" onclick="asLoadCourseLibrary()">刷新课程库</button>
+                            <button class="action-btn edit" onclick="asAddSelectedLibrary()">加入所选课程</button>
+                            <span class="as-hint">勾选课程后点击「加入所选课程」批量添加</span>
+                        </div>
+                        <div class="as-lib-search">
+                            <input type="search" id="asLibrarySearch" placeholder="搜索课程名称 / 教师 / 教室" autocomplete="off" oninput="asFilterLibrary()">
+                            <span class="as-lib-count" id="asLibraryCount"></span>
+                        </div>
+                        <div id="asCourseLibrary" class="as-check-list"><p class="empty-hint">点击「刷新课程库」加载 Course 表课程</p></div>
+                    </div>
+
+                    <div class="as-source" id="asSourceText" style="display:none;">
+                        <div class="as-field">
+                            <label>课程文字描述</label>
+                            <textarea id="asTextInput" class="user-field" rows="5" placeholder="例如：Java 每周 4 节、实训每周 2 节、体育每周 2 节&#10;也可写：Java 每周4节 张老师 机房"></textarea>
+                        </div>
+                        <div class="as-actions-inline">
+                            <button class="action-btn edit" id="asTextParseBtn" onclick="asParseText()">AI 解析并加入清单</button>
+                        </div>
+                    </div>
+
+                    <div class="as-source" id="asSourceExcel" style="display:none;">
+                        <div class="as-field">
+                            <label>上传 xlsx 文件</label>
+                            <input type="file" id="asExcelFile" accept=".xlsx" style="font-size:13px;">
+                            <p class="as-hint">列约定：课程名 / 周学时 / 授课教师 / 教室类型 / 周次（含表头时自动识别列名）。</p>
+                        </div>
+                        <div class="as-actions-inline">
+                            <button class="action-btn edit" id="asExcelParseBtn" onclick="asParseExcel()">解析并加入清单</button>
+                        </div>
+                    </div>
+
+                    <div class="as-source" id="asSourceImage" style="display:none;">
+                        <div class="as-field">
+                            <label>上传课表 / 课程计划图片</label>
+                            <input type="file" id="asImageFile" accept=".jpg,.jpeg,.png,.webp" style="font-size:13px;">
+                            <p class="as-hint" id="asImageHint">支持 jpg/png/webp，大小不超过 5MB。</p>
+                        </div>
+                        <div class="as-actions-inline">
+                            <button class="action-btn edit" id="asImageParseBtn" onclick="asParseImage()">识图并加入清单</button>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">课程清单</h3>
+                    <div class="as-course-head">
+                        <span class="as-help" tabindex="0" role="button" aria-label="教室方式说明">?<span class="as-help-tip"><strong>AI 自动推荐</strong>：按所选教室类型，在生成时自动分配到空闲的具体教室，同楼栋优先、容量匹配。<br><strong>指定教室</strong>：固定使用所选教室；该时段被占用时给出冲突提示，勾选「占用可换」才会换到同类型的其他教室。<br><strong>无需教室</strong>：适用于体育课等不需要教室的课程。</span></span>
+                    </div>
+                    <div class="table-container as-course-wrap">
+                        <table class="data-table as-course-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:20%;">课程名称</th>
+                                    <th style="width:7%;">周学时</th>
+                                    <th style="width:16%;">授课教师</th>
+                                    <th style="width:38%;">教室</th>
+                                    <th style="width:10%;">周次<span class="as-required">*</span></th>
+                                    <th style="width:9%;" class="as-col-actions">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="asCourseBody">
+                                <tr><td colspan="6" class="empty-hint">暂无课程，请从上方四种来源加入课程</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="as-actions">
+                        <button class="action-btn delete" onclick="asGoStep(1)">上一步</button>
+                        <button class="action-btn edit" onclick="asGoStep(3)">下一步：时间与约束</button>
+                    </div>
+                </section>
+
+                <section class="as-panel" id="asPanel3" style="display:none;">
+                    <h3 class="section-title">3. 时间与约束设置</h3>
+                    <div class="as-grid">
+                        <div class="as-field">
+                            <label>每天节次范围</label>
+                            <div class="as-inline">
+                                第 <input type="number" id="asMinPeriod" class="as-num" min="1" max="10" value="1"> 节
+                                至 <input type="number" id="asMaxPeriod" class="as-num" min="2" max="10" value="8"> 节
+                            </div>
+                        </div>
+                        <div class="as-field">
+                            <label>排课选项</label>
+                            <div class="as-radio-row">
+                                <label class="as-radio"><input type="checkbox" id="asAllowWeekend"> 允许周末排课</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="as-adopted-area">
+                        <div class="as-adopted-head">
+                            <div>
+                                <span class="as-constraint-label">已审核通过的排课约束</span>
+                                <span class="as-hint">优先推荐，勾选后可一键批量导入下方约束框</span>
+                            </div>
+                            <div class="as-adopted-tools">
+                                <label class="as-req-check"><input type="checkbox" id="asAdoptedAll" onchange="asToggleAdoptedAll(this.checked)"> 全选</label>
+                                <span class="as-hint" id="asAdoptedSelHint">已选 0 条</span>
+                                <button type="button" class="action-btn edit as-btn-sm" id="asAdoptedImportBtn" onclick="asImportAdoptedConstraints()">导入所选约束</button>
+                                <button type="button" class="action-btn edit as-btn-sm" onclick="asLoadAdoptedConstraints()">刷新</button>
+                            </div>
+                        </div>
+                        <div id="asAdoptedList" class="as-adopted-list"><p class="empty-hint">加载中...</p></div>
+                        <div id="asAdoptedImportMsg" class="as-adopted-msg"></div>
+                    </div>
+                    <div class="as-constraint-area">
+                        <label class="as-constraint-label">排课约束（手动输入，可选）</label>
+                        <textarea id="asConstraints" class="as-constraint-input" rows="3"
+                            placeholder="例：李老师周二不能上课；24级软件1班周三下午不排课；B3-201教室不安排晚自习"></textarea>
+                        <div class="as-constraint-bar">
+                            <span class="as-constraint-tip">多条约束用换行或分号分隔，留空则不添加额外约束</span>
+                            <button type="button" class="action-btn edit as-btn-sm" onclick="asFillConstraintExample()">填入示例</button>
+                        </div>
+                        <div id="asConstraintSummary" class="as-constraint-summary" style="display:none;"></div>
+                    </div>
+                    <div id="asGenMsg" class="as-msg"></div>
+                    <div class="as-actions">
+                        <button class="action-btn delete" onclick="asGoStep(2)">上一步</button>
+                        <button class="action-btn edit" id="asGenerateBtn" onclick="asGenerate()">生成排课预览</button>
+                    </div>
+                </section>
+
+                <section class="as-panel" id="asPanel4" style="display:none;">
+                    <h3 class="section-title">4. 预览确认（未确认前不写入任何数据）</h3>
+                    <p class="as-summary" id="asPreviewSummary">-</p>
+                    <div class="as-unmatched as-failure-box" id="asFailureBox" style="display:none;">
+                        <div class="as-unmatched-title" id="asFailureTitle">以下课程未能排入，其余课程已正常排出</div>
+                        <ul class="as-unmatched-list" id="asFailureList"></ul>
+                    </div>
+                    <div id="asPreviewConstraintSummary" class="as-constraint-summary" style="display:none;"></div>
+                    <div class="as-unmatched" id="asUnmatchedBox" style="display:none;">
+                        <div class="as-unmatched-title">以下排课要求未生效，可一键通知相关教师</div>
+                        <ul class="as-unmatched-list" id="asUnmatchedList"></ul>
+                        <div class="as-unmatched-actions">
+                            <button class="action-btn edit as-btn-sm" id="asNotifyUnmatchedBtn" onclick="asNotifyUnmatched()">一键通知教师</button>
+                            <span class="as-hint" id="asNotifyMsg"></span>
+                        </div>
+                    </div>
+                    <div class="section-head-row as-preview-view-head">
+                        <h4 class="section-title as-preview-subtitle">课表明细</h4>
+                        <div class="seg-switch" role="tablist" aria-label="预览课表视图切换">
+                            <button class="seg-btn active" id="asPreviewListBtn" role="tab" aria-selected="true" onclick="asSwitchPreviewView('list')">列表</button>
+                            <button class="seg-btn" id="asPreviewGridBtn" role="tab" aria-selected="false" onclick="asSwitchPreviewView('grid')">课程表</button>
+                        </div>
+                    </div>
+                    <div class="table-container" id="asPreviewListView">
+                        <table class="data-table as-preview-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th><th>班级</th><th>课程</th><th>教室</th><th>教师</th>
+                                    <th>星期</th><th>节次</th><th>周次</th><th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody id="asPreviewBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="asPreviewGridView" style="display:none;">
+                        <div class="sched-grid-wrap" id="asPreviewGridWrap"></div>
+                    </div>
+                    <div class="as-constraint-area">
+                        <label class="as-constraint-label">自然语言调整（可反复叠加，调整满意后再确认入库）</label>
+                        <textarea id="asModifyInput" class="as-constraint-input" rows="2"
+                            placeholder="例：把数据库原理与实践从周一 1-2 节调到周三下午；计算机网络换到 B3-201；王建国周二 1-2 节与李秀英周三 1-2 节对调"></textarea>
+                        <div class="as-constraint-bar">
+                            <span class="as-constraint-tip">用自然语言描述调整意图（调节次 / 换教室 / 两节课对调 / 删除某条 / 调整周次），多条调整用分号、逗号或换行分隔</span>
+                            <button type="button" class="action-btn edit as-btn-sm" id="asModifyBtn" onclick="asApplyModify()">应用调整</button>
+                        </div>
+                        <div id="asModifyMsg" class="as-msg"></div>
+                    </div>
+                    <div class="as-actions">
+                        <button class="action-btn delete" onclick="asCancelPreview()">取消</button>
+                        <button class="action-btn edit" onclick="asRegenerate()">重新生成</button>
+                        <button class="action-btn edit" id="asConfirmBtn" onclick="asConfirmInsert()">确认入库</button>
+                    </div>
+                </section>
+            </div>
+
+            <div id="classesPage" class="page-card" style="display:none;">
+                <div class="provider-page-head">
+                    <div>
+                        <p class="eyebrow">Classes · 班级</p>
+                        <h2>班级管理</h2>
+                    </div>
+                    <button class="provider-add-btn" onclick="openClassModal()">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                        添加班级
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>班级名</th>
+                                <th>年级</th>
+                                <th>院系</th>
+                                <th>管理教师</th>
+                                <th>学生数</th>
+                                <th>课表条目数</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="classTableBody">
+                            <tr><td colspan="7" class="empty-hint">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="classPager" class="ui-pager"></div>
+            </div>
+
+            <div id="classDetailPage" class="page-card" style="display:none;">
+                <div class="provider-page-head">
+                    <div>
+                        <button class="back-link" onclick="backToClassList()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+                            返回班级列表
+                        </button>
+                        <h2 id="classDetailTitle" style="margin-top:10px;">班级详情</h2>
+                        <p class="page-note" id="classDetailInfo">-</p>
+                    </div>
+                </div>
+
+                <div class="section-head-row">
+                    <h3 class="section-title">课表管理</h3>
+                    <div class="seg-switch" role="tablist" aria-label="课表视图切换">
+                        <button class="seg-btn active" id="scheduleViewListBtn" role="tab" aria-selected="true" onclick="switchScheduleView('list')">列表</button>
+                        <button class="seg-btn" id="scheduleViewGridBtn" role="tab" aria-selected="false" onclick="switchScheduleView('grid')">课程表</button>
+                    </div>
+                </div>
+                <div class="filter-bar">
+                    <select id="scheduleDayFilter" onchange="onScheduleDayFilterChange()">
+                        <option value="">全部星期</option>
+                        <option value="1">周一</option>
+                        <option value="2">周二</option>
+                        <option value="3">周三</option>
+                        <option value="4">周四</option>
+                        <option value="5">周五</option>
+                        <option value="6">周六</option>
+                        <option value="7">周日</option>
+                    </select>
+                    <button onclick="openScheduleModal()">添加课表条目</button>
+                    <button onclick="openImportModal('text')">AI 文字导入</button>
+                    <button id="btnImportImage" onclick="openImportModal('image')">AI 识图导入</button>
+                    <span class="batch-bar" id="scheduleBatchBar">
+                        <button class="batch-del-btn" id="scheduleBatchDeleteBtn" onclick="batchDeleteSchedule()" disabled>批量删除</button>
+                        <span class="batch-hint" id="scheduleBatchHint">已选 0 条</span>
+                    </span>
+                </div>
+                <div class="table-container" id="scheduleListView">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="col-check">
+                                    <input type="checkbox" id="scheduleSelectAll" onchange="toggleScheduleSelectAll(this.checked)"
+                                           title="全选 / 取消全选" aria-label="全选 / 取消全选">
+                                </th>
+                                <th>课程</th>
+                                <th>教师</th>
+                                <th>教室</th>
+                                <th>星期</th>
+                                <th>节次</th>
+                                <th>周次</th>
+                                <th>学期</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleTableBody">
+                            <tr><td colspan="9" class="empty-hint">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="scheduleGridView" style="display:none;">
+                    <div class="sched-grid-wrap" id="scheduleGridWrap"></div>
+                </div>
+
+                <h3 class="section-title">学生列表</h3>
+                <div class="filter-bar">
+                    <select id="studentStatusFilter" onchange="renderStudentTable()">
+                        <option value="">全部状态</option>
+                        <option value="approved">已加入</option>
+                        <option value="pending">申请中</option>
+                        <option value="withdraw_pending">退班待审核</option>
+                    </select>
+                    <button onclick="openStudentPicker()">添加学生</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>学号</th>
+                                <th>姓名</th>
+                                <th>学院</th>
+                                <th>专业</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody">
+                            <tr><td colspan="5" class="empty-hint">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="reservationsPage" class="page-card" style="display:none;">
+                <p class="eyebrow">Reservations · 预约</p>
+                <h2>预约管理</h2>
+                <div class="search-bar">
+                    <input type="text" id="reservationSearch" placeholder="搜索学号、姓名或教室号..." onkeyup="filterReservations()">
+                    <button onclick="filterReservations()">搜索</button>
+                </div>
+                <div class="filter-bar">
+                    <select id="filterReservationStatus" onchange="filterReservations()">
+                        <option value="">全部状态</option>
+                        <option value="pending">待审核</option>
+                        <option value="approved">已通过</option>
+                        <option value="rejected">已拒绝</option>
+                    </select>
+                    <input type="date" id="filterReservationDate" onchange="filterReservations()">
+                    <button onclick="resetReservationFilters()">重置筛选</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>预约号</th>
+                                <th>学生学号</th>
+                                <th>学生姓名</th>
+                                <th>教室号</th>
+                                <th>预约日期</th>
+                                <th>时间段</th>
+                                <th>用途</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservationTableBody">
+                        </tbody>
+                    </table>
+                    <div id="reservationPager" class="ui-pager"></div>
+                </div>
+            </div>
+
+            <div id="adjustmentsPage" class="page-card" style="display:none;">
+                <p class="eyebrow">Adjustments · 调课</p>
+                <h2>调课审批</h2>
+                <div class="filter-bar">
+                    <select id="filterAdjustmentStatus" onchange="filterAdjustments()">
+                        <option value="">全部状态</option>
+                        <option value="pending">待审核</option>
+                        <option value="approved">已批准</option>
+                        <option value="rejected">已拒绝</option>
+                        <option value="cancelled">已撤销</option>
+                    </select>
+                    <button onclick="loadAdjustments()">刷新</button>
+                    <button onclick="cleanupAdjustmentAttachments()">清理孤儿附件</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>课程</th>
+                                <th>班级</th>
+                                <th>教师</th>
+                                <th>申请时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adjustmentTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="adjustmentPager" class="ui-pager"></div>
+            </div>
+
+            <div id="notificationsPage" class="page-card" style="display:none;">
+                <p class="eyebrow">Notifications · 通知</p>
+                <h2>通知管理</h2>
+                <div class="notif-send-card">
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">通知标题</label>
+                        <input type="text" id="notifTitle" placeholder="请输入通知标题" maxlength="100">
+                    </div>
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">通知内容</label>
+                        <textarea id="notifContent" rows="4" placeholder="请输入通知内容（纯文本）" maxlength="500" style="width:100%;"></textarea>
+                    </div>
+                    <div class="notif-send-row">
+                        <div class="form-group" style="margin-bottom:12px;">
+                            <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">接收范围</label>
+                            <select id="notifScope" onchange="onNotifScopeChange()">
+                                <option value="all_users">全部用户（学生 + 教师）</option>
+                                <option value="all_students">全部学生</option>
+                                <option value="class">指定班级</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="notifClassGroup" style="margin-bottom:12px;display:none;">
+                            <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">目标班级</label>
+                            <select id="notifClassSelect">
+                                <option value="">加载中...</option>
+                            </select>
+                        </div>
+                        <button class="notif-send-btn" id="notifSendBtn" onclick="sendAdminNotification()">发送通知</button>
+                    </div>
+                    <div class="form-result" id="notifSendResult" style="display:none;"></div>
+                </div>
+                <h3 class="section-title">历史发送记录</h3>
+                <div class="table-container">
+                    <table class="data-table notif-history-table">
+                        <thead>
+                            <tr>
+                                <th>标题</th>
+                                <th>内容</th>
+                                <th>范围</th>
+                                <th>发送时间</th>
+                                <th>接收人数</th>
+                                <th>已读 / 未读</th>
+                                <th>发送人</th>
+                            </tr>
+                        </thead>
+                        <tbody id="notifHistoryBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="operationLogsPage" class="page-card" style="display:none;">
+                <p class="eyebrow">Audit · 审计</p>
+                <h2>操作日志</h2>
+                <p class="page-note">记录学生端、教师端、管理端的关键操作。日志只读，不提供修改与删除。</p>
+
+                <div class="filter-bar ops-filter-bar">
+                    <select id="opsRole" onchange="loadOperationLogs(1)">
+                        <option value="">全部角色</option>
+                        <option value="student">学生</option>
+                        <option value="teacher">教师</option>
+                        <option value="admin">管理员</option>
+                    </select>
+                    <input type="text" id="opsUsername" placeholder="操作人账号 / 姓名" maxlength="50"
+                           onkeydown="if (event.key === 'Enter') { loadOperationLogs(1); }">
+                    <select id="opsAction" onchange="loadOperationLogs(1)">
+                        <option value="">全部操作类型</option>
+                        <option value="login">登录</option>
+                        <option value="logout">登出</option>
+                        <option value="register">注册</option>
+                        <option value="apply">申请</option>
+                        <option value="approve">批准</option>
+                        <option value="force-approve">强制放行</option>
+                        <option value="reject">拒绝</option>
+                        <option value="cancel">取消</option>
+                        <option value="import">导入</option>
+                        <option value="export">导出</option>
+                        <option value="generate">生成</option>
+                        <option value="confirm">确认</option>
+                        <option value="create">新增</option>
+                        <option value="update">修改</option>
+                        <option value="delete">删除</option>
+                        <option value="read">已读</option>
+                        <option value="send">发送</option>
+                        <option value="reserve">预约</option>
+                        <option value="query">查询</option>
+                    </select>
+                    <select id="opsResult" onchange="loadOperationLogs(1)">
+                        <option value="">全部结果</option>
+                        <option value="success">成功</option>
+                        <option value="failed">失败</option>
+                    </select>
+                    <input type="datetime-local" id="opsStartTime" title="开始时间">
+                    <span class="ops-time-sep">至</span>
+                    <input type="datetime-local" id="opsEndTime" title="结束时间">
+                    <button onclick="loadOperationLogs(1)">查询</button>
+                    <button onclick="resetOperationLogFilters()">重置</button>
+                    <button onclick="exportOperationLogs()">导出 CSV</button>
+                </div>
+
+                <h3 class="section-title">存储与清理策略</h3>
+                <div class="ops-config" id="opsConfig">
+                    <label class="ops-config-field">数据库保留天数
+                        <input type="number" id="opsRetentionDays" min="1" max="3650" value="90">
+                    </label>
+                    <label class="ops-config-field">文件保留天数
+                        <input type="number" id="opsFileKeepDays" min="1" max="3650" value="30">
+                    </label>
+                    <label class="ops-switch"><input type="checkbox" id="opsRecordAllReads"> 记录所有读操作</label>
+                    <label class="ops-switch"><input type="checkbox" id="opsFileEnabled" checked> 写入文件日志</label>
+                    <label class="ops-switch"><input type="checkbox" id="opsArchiveEnabled"> 清理前归档 CSV</label>
+                    <button onclick="saveOperationLogConfig()">保存配置</button>
+                </div>
+                <div class="form-result" id="opsConfigResult" style="display:none;"></div>
+
+                <div class="table-container">
+                    <table class="data-table ops-table">
+                        <thead>
+                            <tr>
+                                <th>操作时间</th>
+                                <th>操作人</th>
+                                <th>角色</th>
+                                <th>操作类型</th>
+                                <th>操作对象</th>
+                                <th>详情</th>
+                                <th>结果</th>
+                                <th>IP</th>
+                                <th>耗时</th>
+                            </tr>
+                        </thead>
+                        <tbody id="opsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="ops-pager">
+                    <span class="ops-page-info" id="opsPageInfo">—</span>
+                    <button class="action-btn" id="opsPrevBtn" onclick="loadOperationLogs(opsPage - 1)">上一页</button>
+                    <button class="action-btn" id="opsNextBtn" onclick="loadOperationLogs(opsPage + 1)">下一页</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script th:inline="javascript">
+        window.ADMIN_NAME = /*[[${user.name}]]*/ '';
+    </script>
+    <script th:src="@{/js/ui-feedback.js(v='20261121a')}"></script>
+    <script th:src="@{/js/week-range.js(v='20261025n2')}"></script>
+    <script th:src="@{/js/admin-common.js(v='20261025m2')}"></script>
+    <script th:src="@{/js/admin-dashboard.js(v='20261025m2')}"></script>
+    <script th:src="@{/js/admin-providers.js(v='20261025m2')}"></script>
+    <script th:src="@{/js/admin-classes.js(v='20261121b')}"></script>
+    <script th:src="@{/js/ai-fetch.js(v='20261025q1')}"></script>
+    <script th:src="@{/js/admin-classes-schedule.js(v='20261029q1')}"></script>
+    <script th:src="@{/js/admin-users.js(v='20261121b')}"></script>
+    <script th:src="@{/js/admin-rooms.js(v='20261025m2')}"></script>
+    <script th:src="@{/js/admin-class-schedule.js(v='20261025m2')}"></script>
+    <script th:src="@{/js/admin-reservations.js(v='20261120a')}"></script>
+    <script th:src="@{/js/admin-notifications.js(v='20261121b')}"></script>
+    <script th:src="@{/js/admin-adjustments.js(v='20261121c')}"></script>
+    <script th:src="@{/js/admin-schedule-ai.js(v='20261121b')}"></script>
+    <script th:src="@{/js/admin-schedule-preview.js(v='20261025q2')}"></script>
+    <script th:src="@{/js/admin-semester.js(v='20261025m2')}"></script>
+    <script th:src="@{/js/admin-oplog.js(v='20261120b')}"></script>
+    <script th:src="@{/js/admin-schedule-requests.js(v='20261027a')}"></script>
+    <script th:src="@{/js/admin-schedule-constraint-picker.js(v='20261027a')}"></script>
+
+    <!-- 教师已提交排课要求弹窗 -->
+    <div class="modal-overlay" id="asReqModal">
+        <div class="modal-content as-req-modal">
+            <div class="modal-header">
+                <h3>教师已提交排课要求 <span class="as-req-badge" id="asReqModalBadge" style="display:none;">0</span></h3>
+                <button class="modal-close" onclick="asCloseConstraintRequests()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="as-req-toolbar">
+                    <select id="asReqStatusFilter" class="user-field" style="max-width:170px;" onchange="asLoadConstraintRequests()">
+                        <option value="">待处理 + 已采纳</option>
+                        <option value="PENDING">仅待处理</option>
+                        <option value="ADOPTED">仅已采纳</option>
+                        <option value="REJECTED">已驳回</option>
+                        <option value="CANCELLED">已撤销</option>
+                        <option value="ALL">全部</option>
+                    </select>
+                    <span class="as-hint" id="asReqStats"></span>
+                </div>
+                <div class="as-req-list" id="asReqList"><p class="empty-hint">加载中...</p></div>
+                <div class="as-req-note-row">
+                    <input type="text" id="asReqNote" class="user-field" placeholder="管理员备注 / 驳回原因（驳回时必填，会通知教师）">
+                </div>
+            </div>
+            <div class="modal-footer as-req-foot">
+                <span class="as-hint" id="asReqSelHint">已选 0 条</span>
+                <div class="as-req-foot-actions">
+                    <button class="action-btn edit" onclick="asAdoptSelected()">采纳所选</button>
+                    <button class="action-btn delete" onclick="asRejectSelected()">驳回所选</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户详情/编辑弹窗 -->
+    <div class="modal-overlay" id="userEditModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="userModalTitle">用户详情</h3>
+                <button class="modal-close" onclick="closeUserEditModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="userModalBody">
+                <input type="hidden" id="editUserId">
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">学号</label>
+                    <input type="text" id="editUserStudentId" class="user-field user-field-locked" readonly>
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">姓名</label>
+                    <input type="text" id="editUserName" class="user-field">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">手机号</label>
+                    <input type="text" id="editUserPhone" class="user-field">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">邮箱</label>
+                    <input type="text" id="editUserEmail" class="user-field">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">角色</label>
+                    <input type="text" id="editUserRole" class="user-field user-field-locked" readonly>
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">学院</label>
+                    <input type="text" id="editUserDepartment" class="user-field">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">专业</label>
+                    <input type="text" id="editUserMajor" class="user-field">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">年级</label>
+                    <input type="text" id="editUserGrade" class="user-field">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">状态</label>
+                    <select id="editUserStatus" class="user-field">
+                        <option value="1">正常</option>
+                        <option value="0">禁用</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;padding:16px 24px;">
+                <button id="userEditBtn" class="action-btn edit" onclick="startUserEdit()">编辑</button>
+                <button id="userSaveBtn" class="action-btn edit" style="display:none;" onclick="saveUserEdit()">保存</button>
+                <button id="userCancelBtn" class="action-btn delete" style="display:none;" onclick="cancelUserEdit()">取消</button>
+                <button id="userCloseBtn" class="action-btn delete" onclick="closeUserEditModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 教室编辑弹窗 -->
+    <div class="modal-overlay" id="classroomEditModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑教室信息</h3>
+                <button class="modal-close" onclick="closeClassroomEditModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editClassroomId">
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">教室号</label>
+                    <input type="text" id="editClassroomNo" style="width:100%;padding:8px 12px;border:1px solid #D8D8D4;border-radius:8px;">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">楼栋</label>
+                    <input type="text" id="editBuilding" style="width:100%;padding:8px 12px;border:1px solid #D8D8D4;border-radius:8px;">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">容量</label>
+                    <input type="number" id="editCapacity" style="width:100%;padding:8px 12px;border:1px solid #D8D8D4;border-radius:8px;">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">教室类型</label>
+                    <select id="editRoomType" style="width:100%;padding:8px 12px;border:1px solid #D8D8D4;border-radius:8px;">
+                        <option value="普通教室">普通教室</option>
+                        <option value="多媒体教室">多媒体教室</option>
+                        <option value="微机室">微机室</option>
+                        <option value="实验室">实验室</option>
+                        <option value="语音室">语音室</option>
+                        <option value="室外场地">室外场地</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">状态</label>
+                    <select id="editClassroomStatus" style="width:100%;padding:8px 12px;border:1px solid #D8D8D4;border-radius:8px;">
+                        <option value="available">可用</option>
+                        <option value="maintenance">维护中</option>
+                        <option value="disabled">停用</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;color:#666666;margin-bottom:4px;">描述</label>
+                    <input type="text" id="editDescription" style="width:100%;padding:8px 12px;border:1px solid #D8D8D4;border-radius:8px;">
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;padding:16px 24px;">
+                <button class="action-btn delete" onclick="closeClassroomEditModal()">取消</button>
+                <button class="action-btn edit" onclick="saveClassroomEdit()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 教室占用明细弹窗 -->
+    <div class="modal-overlay" id="occupancyModal">
+        <div class="modal-content" style="max-width:860px;width:calc(100% - 32px);">
+            <div class="modal-header">
+                <h3>教室占用情况</h3>
+                <button class="modal-close" onclick="closeOccupancyModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="occupancyModalBody">
+                <p class="empty-hint">加载中...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提供商编辑弹窗 -->
+    <div class="modal-overlay" id="providerEditModal">
+        <div class="modal-content provider-modal">
+            <div class="modal-header">
+                <h3 id="providerModalTitle">新增提供商</h3>
+                <button class="modal-close" onclick="closeProviderModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="providerFormId">
+                <div class="provider-form-item">
+                    <label class="provider-form-label">提供商名称 <span class="required">*</span></label>
+                    <input type="text" id="providerFormName" class="form-input" placeholder="如：通义千问">
+                </div>
+                <div class="provider-form-item">
+                    <label class="provider-form-label">API 地址 <span class="required">*</span></label>
+                    <input type="text" id="providerFormApiUrl" class="form-input" placeholder="OpenAI 兼容端点，如 https://api.deepseek.com/v1/chat/completions">
+                </div>
+                <div class="provider-form-item">
+                    <label class="provider-form-label">API Key</label>
+                    <input type="password" id="providerFormApiKey" class="form-input" placeholder="留空则保留原 Key" autocomplete="new-password">
+                    <p class="provider-form-hint" id="providerKeyHint"></p>
+                </div>
+                <div class="provider-form-item">
+                    <label class="provider-form-label">可用模型 <span class="required">*</span></label>
+                    <textarea id="providerFormModels" class="form-input provider-models-input" rows="3" placeholder="多个模型用英文逗号分隔，如 qwen-plus,qwen-turbo"></textarea>
+                </div>
+                <div class="provider-form-item">
+                    <label class="provider-form-label">多模态模型</label>
+                    <textarea id="providerFormMultimodal" class="form-input provider-models-input" rows="2" placeholder="多个模型用英文逗号分隔，如 qwen-vl-plus,qwen-vl-max"></textarea>
+                    <p class="provider-form-hint">填写该提供商支持识图的模型名，逗号分隔；当前生效模型在此列表内时，管理端开放 AI 识图导入课表功能</p>
+                </div>
+                <div class="provider-form-item provider-switch-row">
+                    <label class="provider-form-label" for="providerFormEnabled">启用该提供商</label>
+                    <label class="provider-switch">
+                        <input type="checkbox" id="providerFormEnabled">
+                        <span class="provider-switch-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer provider-modal-footer">
+                <button class="provider-btn provider-btn-ghost" onclick="closeProviderModal()">取消</button>
+                <button class="provider-btn provider-btn-primary" onclick="saveProviderForm()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 班级添加/编辑弹窗 -->
+    <div class="modal-overlay" id="classEditModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="classModalTitle">添加班级</h3>
+                <button class="modal-close" onclick="closeClassModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="classFormId">
+                <div class="form-group">
+                    <label>班级名 <span style="color:#C62828;">*</span></label>
+                    <input type="text" id="classFormName" class="user-field" placeholder="如：24级软件1班">
+                </div>
+                <div class="form-group">
+                    <label>年级</label>
+                    <select id="classFormGrade" class="user-field">
+                        <option value="">请选择年级</option>
+                        <option value="2024">2024级</option>
+                        <option value="2025">2025级</option>
+                        <option value="2026">2026级</option>
+                        <option value="2027">2027级</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>院系</label>
+                    <select id="classFormDepartment" class="user-field">
+                        <option value="">请选择院系</option>
+                        <option value="人工智能学院">人工智能学院</option>
+                        <option value="经济管理学院">经济管理学院</option>
+                        <option value="建筑工程学院">建筑工程学院</option>
+                        <option value="商学院">商学院</option>
+                        <option value="信息学院">信息学院</option>
+                        <option value="艺术学院">艺术学院</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>管理教师</label>
+                    <select id="classFormTeacher" class="user-field">
+                        <option value="">暂不指定</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;padding:16px 24px;">
+                <button class="action-btn delete" onclick="closeClassModal()">取消</button>
+                <button class="action-btn edit" onclick="submitClassModal()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 班级添加学生弹窗 -->
+    <div class="modal-overlay" id="studentPickerModal">
+        <div class="modal-content" style="max-width:620px;width:calc(100% - 32px);">
+            <div class="modal-header">
+                <h3 id="studentPickerTitle">添加学生</h3>
+                <button class="modal-close" onclick="closeStudentPicker()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="student-picker-toolbar">
+                    <input type="text" id="studentPickerSearch" class="user-field"
+                        placeholder="搜索学号 / 姓名 / 学院 / 专业..." oninput="renderStudentPickerList()">
+                    <button type="button" class="action-btn edit sp-select-all-btn"
+                        id="studentPickerSelectAllBtn" onclick="toggleStudentPickerSelectAll()">全选可选</button>
+                </div>
+                <div class="student-picker-hint" id="studentPickerHint">加载中...</div>
+                <div class="student-picker-list" id="studentPickerList"></div>
+            </div>
+            <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;padding:16px 24px;">
+                <button class="action-btn delete" onclick="closeStudentPicker()">取消</button>
+                <button class="action-btn edit" id="studentPickerConfirmBtn" onclick="submitStudentPicker()" disabled>添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 课表条目添加/编辑弹窗 -->
+    <div class="modal-overlay" id="scheduleEditModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="scheduleModalTitle">添加课表条目</h3>
+                <button class="modal-close" onclick="closeScheduleModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="scheduleFormSid">
+                <div class="form-group">
+                    <label>星期 <span style="color:#C62828;">*</span></label>
+                    <select id="scheduleFormWeekDay" class="user-field">
+                        <option value="1">周一</option>
+                        <option value="2">周二</option>
+                        <option value="3">周三</option>
+                        <option value="4">周四</option>
+                        <option value="5">周五</option>
+                        <option value="6">周六</option>
+                        <option value="7">周日</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display:flex;gap:12px;">
+                    <div style="flex:1;">
+                        <label>开始节次 <span style="color:#C62828;">*</span></label>
+                        <select id="scheduleFormStart" class="user-field"></select>
+                    </div>
+                    <div style="flex:1;">
+                        <label>结束节次 <span style="color:#C62828;">*</span></label>
+                        <select id="scheduleFormEnd" class="user-field"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>教室</label>
+                    <select id="scheduleFormClassroom" class="user-field"></select>
+                </div>
+                <div class="form-group">
+                    <label>课程名称 <span style="color:#C62828;">*</span></label>
+                    <input type="text" id="scheduleFormCourse" class="user-field" placeholder="课程不存在将自动创建">
+                </div>
+                <div class="form-group">
+                    <label>教师姓名</label>
+                    <input type="text" id="scheduleFormTeacher" class="user-field" placeholder="默认为该班级管理教师">
+                </div>
+                <div class="form-group">
+                    <label>周次范围</label>
+                    <input type="text" id="scheduleFormWeekRange" class="user-field" data-week-range placeholder="如 1-16、3-6、单周、双周、前8周">
+                    <div class="week-hint" style="display:none;"></div>
+                </div>
+                <div class="form-group">
+                    <label>学期</label>
+                    <input type="text" id="scheduleFormSemester" class="user-field" placeholder="如 2026-2027-1">
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;padding:16px 24px;">
+                <button class="action-btn delete" onclick="closeScheduleModal()">取消</button>
+                <button class="action-btn edit" id="scheduleSubmitBtn" onclick="submitScheduleModal()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 导入课表弹窗（文字 / 识图） -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="importModalTitle">AI 文字导入课表</h3>
+                <button class="modal-close" onclick="closeImportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="importMode" value="text">
+                <div class="form-group">
+                    <label>学期</label>
+                    <input type="text" id="importSemester" class="user-field" value="2026-2027-1">
+                </div>
+                <div class="form-group" id="importTextGroup">
+                    <label>课表文本</label>
+                    <textarea id="importText" class="user-field" rows="6" placeholder="粘贴课表文本，例如：&#10;周一 3-4节 B5-302 1-16周 数据库原理与实践 24级软件1班&#10;周三 1-2节 A1-201 1-16周 数据结构 24级软件1班"></textarea>
+                    <p style="font-size:12px;color:#999999;margin-top:4px;">每行一条记录，包含班级、课程、教室、星期、节次、周次等信息即可。</p>
+                </div>
+                <div class="form-group" id="importImageGroup" style="display:none;">
+                    <label>课表图片</label>
+                    <input type="file" id="importImageFile" accept=".jpg,.jpeg,.png,.webp" style="width:100%;padding:8px 0;font-size:13px;">
+                    <p style="font-size:12px;color:#999999;margin-top:4px;">支持 jpg/png/webp 格式，大小不超过 5MB。</p>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;padding:16px 24px;">
+                <button class="action-btn delete" onclick="closeImportModal()">取消</button>
+                <button class="action-btn edit" id="importParseBtn" onclick="parseImport()">解析预览</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 导入预览确认弹窗 -->
+    <div class="modal-overlay" id="importPreviewModal">
+        <div class="modal-content" style="max-width:860px;width:calc(100% - 32px);">
+            <div class="modal-header">
+                <h3>导入预览确认</h3>
+                <button class="modal-close" onclick="closeImportPreviewModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="importPreviewSummary" style="font-size:13px;color:#666666;margin-bottom:12px;">-</p>
+                <div style="overflow-x:auto;">
+                    <table class="data-table" style="min-width:760px;">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>班级</th>
+                                <th>课程</th>
+                                <th>教室</th>
+                                <th>教师</th>
+                                <th>星期</th>
+                                <th>节次</th>
+                                <th>周次</th>
+                                <th>校验</th>
+                            </tr>
+                        </thead>
+                        <tbody id="importPreviewBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;padding:16px 24px;">
+                <button class="action-btn delete" onclick="closeImportPreviewModal()">取消</button>
+                <button class="action-btn edit" id="importConfirmBtn" onclick="confirmImport()">确认导入</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="providerToast" class="provider-toast"></div>
+
+    <!-- 调课申请详情 / 冲突二次校验弹窗 -->
+    <div class="modal-overlay" id="adjustmentDetailModal">
+        <div class="modal-content" style="max-width:760px;width:calc(100% - 32px);">
+            <div class="modal-header">
+                <h3 id="adjustmentDetailTitle">调课申请详情</h3>
+                <button class="modal-close" onclick="closeAdjustmentDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="adjustmentDetailBody" class="adj-detail-body"></div>
+                <div id="adjustmentAttachmentBox" style="margin-top:14px;"></div>
+                <div id="adjustmentLogBox" style="margin-top:14px;"></div>
+                <div id="adjustmentConflictBox" style="margin-top:14px;"></div>
+            </div>
+            <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;padding:16px 24px;flex-wrap:wrap;">
+                <button class="action-btn" id="adjustmentDetailRecheck" onclick="recheckAdjustmentConflict()">重新校验冲突</button>
+                <button class="action-btn edit" id="adjustmentDetailApprove" onclick="">批准</button>
+                <button class="action-btn delete" id="adjustmentDetailReject" onclick="">拒绝</button>
+                <button class="action-btn edit" id="adjustmentDetailCancelApprove" onclick="" style="display:none;">同意撤销</button>
+                <button class="action-btn edit" id="adjustmentDetailEmergencyReview" onclick="" style="display:none;">确认知悉紧急回滚</button>
+                <button class="action-btn delete" id="adjustmentDetailCancelReject" onclick="" style="display:none;">拒绝撤销</button>
+                <button class="action-btn delete" id="adjustmentDetailCancel" onclick="" style="display:none;">撤销</button>
+                <button class="action-btn" onclick="closeAdjustmentDetailModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 调课拒绝 / 撤销原因弹窗（位于详情弹窗之后，保证从详情打开时显示在最上层） -->
+    <div class="modal-overlay" id="adjustmentReasonModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="adjustmentReasonTitle">填写原因</h3>
+                <button class="modal-close" onclick="closeAdjustmentReasonModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <label style="display:block;font-size:13px;color:#666666;margin-bottom:6px;" id="adjustmentReasonLabel">原因</label>
+                <textarea id="adjustmentReasonInput" rows="4" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #E8E8E6;border-radius:8px;font-size:14px;resize:vertical;" placeholder="请填写原因"></textarea>
+                <div id="adjustmentReasonError" style="display:none;font-size:12px;color:#C62828;margin-top:6px;"></div>
+            </div>
+            <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;padding:16px 24px;">
+                <button class="action-btn delete" onclick="closeAdjustmentReasonModal()">取消</button>
+                <button class="action-btn edit" id="adjustmentReasonConfirm" onclick="confirmAdjustmentReason()">确定</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+# ===== 构建产物 =====
+target/
+out/
+build/
+
+# ===== 运行日志（logs/ops-*.log 含账号、IP 等运行数据，不入库） =====
+logs/
+*.log
+
+# ===== IDE / 编辑器 =====
+.idea/
+.vscode/
+.trae/
+*.iml
+*.ipr
+*.iws
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db
+
+# ===== 本地数据库文件与备份（schema.sql / data.sql 属于源码，不在此列） =====
+*.db
+*.sqlite
+*.sqlite3
+*.mdb
+*.bak
+*.backup
+*.dump
+*.sql.gz
+/backup/
+/db-backup/
+
+# ===== 临时文件与截图产物 =====
+.screenshots/
+*.tmp
+*.swp
+
+# ===== 调课凭证附件上传目录（运行时生成，不入库） =====
+uploads/
+
+# ===== 本地运行配置（自动生成的 API Key 加密密钥等，不入库） =====
+/config/
+ai-key.secret
+
+# ===== 环境变量与证书/密钥文件 =====
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore

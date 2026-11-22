@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111111'/%3E%3Cpath d='M32 15 L53 24.5 L32 34 L11 24.5 Z' fill='none' stroke='%23ffffff' stroke-width='3.5' stroke-linejoin='round'/%3E%3Cpath d='M21 30 V40 C21 44.5 43 44.5 43 40 V30' fill='none' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3Cpath d='M49 27 V40' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3Ccircle cx='49' cy='43.5' r='2.5' fill='%23ffffff'/%3E%3C/svg%3E"/>
+    <title>智小港 - 智慧校园AI智能服务平台</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css(v='20261012d')}">
+    <link rel="stylesheet" th:href="@{/css/home.css(v='20261024i')}">
+    <link rel="stylesheet" th:href="@{/css/ui-feedback.css(v='20261120a')}">
+    <script th:src="@{/js/csrf.js(v='20261121a')}"></script>
+    <script th:src="@{/js/auth-guard.js(v='20260927w')}"></script>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div>
+                <h1>智小港</h1>
+                <p>智慧校园AI智能服务平台</p>
+            </div>
+            <div class="user-info">
+                <div class="notif-wrap">
+                    <button class="notif-bell" id="notifBell" onclick="toggleNotifPanel(event)" aria-label="通知">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span class="notif-badge" id="notifBadge" style="display:none">0</span>
+                    </button>
+                    <div class="notif-panel" id="notifPanel">
+                        <div class="notif-panel-head">
+                            <span class="notif-panel-title">通知</span>
+                            <button class="notif-readall" onclick="markAllNotifRead(event)">全部已读</button>
+                        </div>
+                        <div class="notif-list" id="notifList"><div class="notif-empty">加载中...</div></div>
+                    </div>
+                </div>
+                <div class="user-detail">
+                    <div class="name" id="userName" th:text="${user.name}">用户</div>
+                    <div class="role" th:text="${user.role == 'student' ? '学生' : (user.role == 'admin' ? '管理员' : '教师')}">学生</div>
+                    <div class="student-id" th:text="${user.studentId}">学号</div>
+                </div>
+                <div class="user-avatar" th:text="${user.name.substring(0, 1)}" onclick="showEditProfile()">用</div>
+                <button class="logout-btn" onclick="confirmLogout('/logout')">退出登录</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑姓名弹窗 -->
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <div class="modal-title">编辑个人信息</div>
+            <div class="form-group" style="margin: 20px 0;">
+                <label style="display:block;text-align:left;margin-bottom:8px;font-size:12px;letter-spacing:0.08em;color:#666;">姓名</label>
+                <input type="text" id="editNameInput" maxlength="20" style="width:100%;padding:10px 12px;border:1px solid #D8D8D4;border-radius:8px;font-size:14px;">
+            </div>
+            <div class="form-group" style="margin: 20px 0;">
+                <label style="display:block;text-align:left;margin-bottom:8px;font-size:12px;letter-spacing:0.08em;color:#666;">邮箱</label>
+                <input type="email" id="editEmailInput" style="width:100%;padding:10px 12px;border:1px solid #D8D8D4;border-radius:8px;font-size:14px;" placeholder="请输入邮箱地址">
+            </div>
+            <button class="modal-btn" onclick="saveProfile()">保存</button>
+            <button class="modal-btn modal-btn-ghost" style="margin-left:10px;" onclick="closeEditProfile()">取消</button>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <!-- 左侧导航 -->
+        <div class="sidebar">
+            <button class="sidebar-item active" onclick="showPanel('chat')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>智能问答</button>
+            <button class="sidebar-item" onclick="showPanel('schedule')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>课表查询</button>
+            <button class="sidebar-item" onclick="showPanel('class')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>我的班级</button>
+            <button class="sidebar-item" onclick="showPanel('classroom')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-5h6v5"/><path d="M8 7h.01M16 7h.01M8 11h.01M16 11h.01M8 15h.01M16 15h.01"/></svg>教室查询</button>
+            <button class="sidebar-item" onclick="showPanel('classSchedule')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><rect x="7" y="13" width="3" height="3"/><rect x="14" y="13" width="3" height="3"/><rect x="7" y="17" width="3" height="3"/><rect x="14" y="17" width="3" height="3"/></svg>教室课表</button>
+            <button class="sidebar-item" onclick="showPanel('reservation')"><svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 15.5 11 17.5 15 13.5"/></svg>我的预约</button>
+        </div>
+
+        <!-- 智能问答板块 -->
+        <!-- 保留空容器以兼容 showPanel JS 引用，CSS 强制隐藏 -->
+        <div class="chat-sidebar" id="chatSidebar"></div>
+        <div class="chat-panel active" id="chatPanel">
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <div class="chat-avatar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4M8 4h8"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/></svg></div>
+                    <div class="chat-title">
+                        <p class="eyebrow">Smart Campus · AI Assistant</p>
+                        <h2>你好，<span th:text="${user.name}">同学</span></h2>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="bot-avatar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4M8 4h8"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/></svg></div>
+                    <p>你好！我是智小港AI助手，请问有什么可以帮您的？</p>
+                </div>
+            </div>
+
+            <!-- 快捷操作：输入框上方横排 -->
+            <div class="quick-actions">
+                <div class="dropdown-wrapper">
+                    <button class="quick-action-btn" onclick="toggleDropdown('scheduleDropdown')">
+                        <svg class="qa-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 查询课表
+                        <svg class="arrow-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="dropdown-menu" id="scheduleDropdown">
+                        <div class="dropdown-item" onclick="sendScheduleQuery(0, '本周')"> 本周课表</div>
+                        <div class="dropdown-item" onclick="sendScheduleQuery(0, '下周')"> 下周课表</div>
+                    </div>
+                </div>
+
+                <div class="dropdown-wrapper">
+                    <button class="quick-action-btn" onclick="toggleDropdown('classroomDropdown')">
+                        <svg class="qa-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-5h6v5"/><path d="M8 7h.01M16 7h.01M8 11h.01M16 11h.01"/></svg> 查询空教室
+                        <svg class="arrow-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="dropdown-menu" id="classroomDropdown">
+                        <div class="dropdown-item" th:each="b : ${buildings}" th:text="${b.endsWith('馆') ? b : b + '楼'}"
+                             th:attr="onclick=|sendClassroomQuery('${b}')|"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <textarea class="chat-input" id="chatInput" placeholder="请输入您的问题..." onkeydown="handleKeyDown(event)"></textarea>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="发送" title="发送">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 课表查询板块 -->
+        <div class="schedule-panel" id="schedulePanel">
+            <div class="schedule-content">
+                <div class="panel-head">
+                    <div>
+                        <p class="eyebrow">Schedule · 课表</p>
+                        <h2>课表查询</h2>
+                    </div>
+                    <div class="week-selector">
+                        <label>第</label>
+                        <select id="weekSelect" onchange="loadSchedule()">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                        </select>
+                        <label>周</label>
+                        <button type="button" class="week-today-btn" id="weekTodayBtn" onclick="backToCurrentWeek()" title="回到当前教学周">本周</button>
+                        <span class="week-total-hint" id="weekTotalHint"></span>
+                    </div>
+                </div>
+                
+                <div class="week-range-hint" id="weekRangeHint" style="display:none;"></div>
+                <div class="schedule-table-wrap">
+                <table class="schedule-table" id="scheduleTable">
+                    <thead>
+                        <tr>
+                            <th class="period-header">节次</th>
+                            <th class="day-header">周一</th>
+                            <th class="day-header">周二</th>
+                            <th class="day-header">周三</th>
+                            <th class="day-header">周四</th>
+                            <th class="day-header">周五</th>
+                            <th class="day-header">周六</th>
+                            <th class="day-header">周日</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleBody">
+                        <tr>
+                            <th>1-2节<br/><span style="font-size:10px;color:#666;">8:30-10:10</span></th>
+                            <td class="schedule-cell" data-day="1" data-period="1"></td>
+                            <td class="schedule-cell" data-day="2" data-period="1"></td>
+                            <td class="schedule-cell" data-day="3" data-period="1"></td>
+                            <td class="schedule-cell" data-day="4" data-period="1"></td>
+                            <td class="schedule-cell" data-day="5" data-period="1"></td>
+                            <td class="schedule-cell" data-day="6" data-period="1"></td>
+                            <td class="schedule-cell" data-day="7" data-period="1"></td>
+                        </tr>
+                        <tr>
+                            <th>3-4节<br/><span style="font-size:10px;color:#666;">10:25-12:00</span></th>
+                            <td class="schedule-cell" data-day="1" data-period="2"></td>
+                            <td class="schedule-cell" data-day="2" data-period="2"></td>
+                            <td class="schedule-cell" data-day="3" data-period="2"></td>
+                            <td class="schedule-cell" data-day="4" data-period="2"></td>
+                            <td class="schedule-cell" data-day="5" data-period="2"></td>
+                            <td class="schedule-cell" data-day="6" data-period="2"></td>
+                            <td class="schedule-cell" data-day="7" data-period="2"></td>
+                        </tr>
+                        <tr>
+                            <th>5-6节<br/><span style="font-size:10px;color:#666;">14:00-15:40</span></th>
+                            <td class="schedule-cell" data-day="1" data-period="3"></td>
+                            <td class="schedule-cell" data-day="2" data-period="3"></td>
+                            <td class="schedule-cell" data-day="3" data-period="3"></td>
+                            <td class="schedule-cell" data-day="4" data-period="3"></td>
+                            <td class="schedule-cell" data-day="5" data-period="3"></td>
+                            <td class="schedule-cell" data-day="6" data-period="3"></td>
+                            <td class="schedule-cell" data-day="7" data-period="3"></td>
+                        </tr>
+                        <tr>
+                            <th>7-8节<br/><span style="font-size:10px;color:#666;">15:55-17:30</span></th>
+                            <td class="schedule-cell" data-day="1" data-period="4"></td>
+                            <td class="schedule-cell" data-day="2" data-period="4"></td>
+                            <td class="schedule-cell" data-day="3" data-period="4"></td>
+                            <td class="schedule-cell" data-day="4" data-period="4"></td>
+                            <td class="schedule-cell" data-day="5" data-period="4"></td>
+                            <td class="schedule-cell" data-day="6" data-period="4"></td>
+                            <td class="schedule-cell" data-day="7" data-period="4"></td>
+                        </tr>
+                        <tr>
+                            <th>9-10节<br/><span style="font-size:10px;color:#666;">18:30-20:15</span></th>
+                            <td class="schedule-cell" data-day="1" data-period="5"></td>
+                            <td class="schedule-cell" data-day="2" data-period="5"></td>
+                            <td class="schedule-cell" data-day="3" data-period="5"></td>
+                            <td class="schedule-cell" data-day="4" data-period="5"></td>
+                            <td class="schedule-cell" data-day="5" data-period="5"></td>
+                            <td class="schedule-cell" data-day="6" data-period="5"></td>
+                            <td class="schedule-cell" data-day="7" data-period="5"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 我的班级板块 -->
+        <div class="content-panel" id="classPanel">
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">My Class · 班级</p>
+                    <h2>我的班级</h2>
+                </div>
+            </div>
+
+            <div id="myClassInfo" class="class-info-box" style="display:none;">
+                <div class="class-info-name" id="myClassName"></div>
+                <div class="class-info-meta" id="myClassMeta"></div>
+                <div class="class-info-meta" id="myClassTeacher"></div>
+                <button class="modal-btn" id="withdrawBtn" style="margin-top:14px;" onclick="withdrawClass()">申请退班</button>
+                <button class="modal-btn modal-btn-ghost" id="cancelWithdrawBtn" style="margin-top:14px;display:none;" onclick="cancelWithdraw()">取消退班申请</button>
+                <div id="withdrawStatus" class="class-pending-status" style="display:none;">退班申请待审核</div>
+            </div>
+
+            <div id="noClassInfo" class="class-empty-box" style="display:none;">
+                您尚未加入任何班级，请在下方列表中申请加入。
+            </div>
+
+            <h3 class="section-subtitle">可加入的班级</h3>
+            <div class="class-search-wrap">
+                <div class="class-search-box">
+                    <input type="text" id="classSearchInput" class="class-search-input"
+                           placeholder="输入班级名、班主任、二级学院或级部即可实时筛选"
+                           autocomplete="off"
+                           oninput="onClassSearchInput(this.value)"
+                           onkeydown="if (event.key === 'Enter') { event.preventDefault(); applyClassSearchNow(); }">
+                    <button type="button" class="class-search-clear" id="classSearchClear" title="清空搜索"
+                            onclick="clearClassSearch()" hidden>&times;</button>
+                </div>
+                <span class="class-search-hint" id="classSearchHint">输入关键词即可实时筛选，无需回车</span>
+            </div>
+            <div id="classListContainer" class="class-list-container"></div>
+            <div id="classPager" class="ui-pager"></div>
+        </div>
+
+        <!-- 教室查询板块 -->
+        <div class="content-panel" id="classroomPanel">
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Classroom · 教室</p>
+                    <h2>教室查询</h2>
+                </div>
+            </div>
+
+            <div class="classroom-controls">
+                <div class="classroom-filters">
+                    <div class="classroom-filter">
+                        <label>教学楼：</label>
+                        <select id="classroomBuilding" onchange="refreshClassrooms()">
+                            <option value="">全部教学楼</option>
+                            <option th:each="b : ${buildings}" th:value="${b}"
+                                    th:text="${b.endsWith('馆') ? b : b + '楼'}"></option>
+                        </select>
+                    </div>
+                    <div class="classroom-filter">
+                        <label>日期：</label>
+                        <input type="date" id="classroomDate" onchange="refreshClassrooms()">
+                    </div>
+                    <div class="classroom-filter">
+                        <label>节次：</label>
+                        <select id="classroomPeriod" onchange="refreshClassrooms()">
+                            <option value="">全部节次</option>
+                            <option value="1">1-2节 (8:30-10:10)</option>
+                            <option value="2">3-4节 (10:25-12:00)</option>
+                            <option value="3">5-6节 (14:00-15:40)</option>
+                            <option value="4">7-8节 (15:55-17:30)</option>
+                            <option value="5">9-10节 (18:30-20:15)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="queryClassrooms()">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> 查询空教室
+                </button>
+            </div>
+            
+            <div class="classroom-info" id="classroomInfo">
+                <div class="info-card">
+                    <div class="info-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                    <div class="info-content">
+                        <div class="info-label">当前时间</div>
+                        <div class="info-value" id="currentTime">--:--:--</div>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+                    <div class="info-content">
+                        <div class="info-label">当前节次</div>
+                        <div class="info-value" id="currentPeriod">--</div>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg></div>
+                    <div class="info-content">
+                        <div class="info-label">下一节次</div>
+                        <div class="info-value" id="nextPeriod">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="period-ended-banner" id="periodEndedBanner" hidden>
+                <span class="period-ended-text">今天已无上课时段，可预约明天或查询明天空教室</span>
+                <button type="button" class="next-day-btn" id="nextDayBtn" onclick="switchClassroomDateToTomorrow()">查询明天空教室</button>
+            </div>
+            
+            <div id="currentPeriodLabel" style="display:none;">
+                <span class="period-label" id="periodDisplayLabel"></span>
+            </div>
+            
+            <div class="classroom-list" id="classroomList">
+                <div class="empty-state">
+                    <div class="empty-icon"></div>
+                    <p>点击上方按钮查询空教室</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 教室课表板块 -->
+        <div class="content-panel" id="classSchedulePanel">
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Class Schedule · 教室课表</p>
+                    <h2>教室课表</h2>
+                </div>
+            </div>
+            <div class="cs-toolbar">
+                <div class="cs-filter">
+                    <label for="csClassroomSelect">选择教室：</label>
+                    <select id="csClassroomSelect" onchange="loadClassSchedule()"></select>
+                </div>
+                <p class="cs-note">无教室课程（体育课等）不占用教室。</p>
+            </div>
+            <div id="csMatrixWrap">
+                <div class="empty-state"><p>加载中...</p></div>
+            </div>
+        </div>
+
+        <!-- 我的预约板块 -->
+        <div class="content-panel" id="myReservationPanel">
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">My Reservations · 预约</p>
+                    <h2>我的预约</h2>
+                </div>
+                <button class="btn-secondary" onclick="loadMyReservations()">刷新</button>
+            </div>
+            <p class="resv-note">这里列出你的全部教室预约；待审核的预约可取消申请。</p>
+            <div class="resv-table-wrap">
+                <table class="resv-table">
+                    <thead>
+                        <tr>
+                            <th>教室</th>
+                            <th>日期</th>
+                            <th>节次</th>
+                            <th>原因</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="myReservationBody">
+                        <tr><td colspan="6"><div class="empty-state"><p>加载中...</p></div></td></tr>
+                    </tbody>
+                </table>
+                <div id="myReservationPager" class="ui-pager"></div>
+            </div>
+        </div>
+
+        <!-- 预约弹窗 -->
+        <div class="modal-overlay" id="reserveModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>预约教室</h3>
+                    <span class="close-btn" onclick="closeReserveModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>教室：</label>
+                        <input type="text" id="reserveClassroom" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>预约日期：</label>
+                        <div class="date-field">
+                            <input type="text" id="reserveDate" placeholder="YYYY-MM-DD，可直接输入" maxlength="10" inputmode="numeric" autocomplete="off" onblur="checkReserveDate(false)">
+                            <button type="button" class="date-pick-btn" onclick="openReserveDatePicker()" aria-label="打开日历选择日期" title="打开日历">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            </button>
+                            <input type="date" id="reserveDatePicker" class="native-date-picker" tabindex="-1" aria-hidden="true" onchange="applyReserveDateFromPicker(this)">
+                        </div>
+                        <div class="date-error" id="reserveDateError"></div>
+                    </div>
+                    <div class="reserve-time-hint" id="reserveTimeHint"></div>
+                    <div class="form-group">
+                        <label>开始节次：</label>
+                        <select id="reserveStartPeriod">
+                            <option value="1">1-2节 (8:30-10:10)</option>
+                            <option value="2">3-4节 (10:25-12:00)</option>
+                            <option value="3">5-6节 (14:00-15:40)</option>
+                            <option value="4">7-8节 (15:55-17:30)</option>
+                            <option value="5">9-10节 (18:30-20:15)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>结束节次：</label>
+                        <select id="reserveEndPeriod">
+                            <option value="1">1-2节 (8:30-10:10)</option>
+                            <option value="2">3-4节 (10:25-12:00)</option>
+                            <option value="3">5-6节 (14:00-15:40)</option>
+                            <option value="4">7-8节 (15:55-17:30)</option>
+                            <option value="5">9-10节 (18:30-20:15)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>预约原因：</label>
+                        <textarea id="reserveReason" maxlength="100" placeholder="请输入预约原因（最多 100 字）" oninput="updateReserveReasonHint()" onpaste="handleReserveReasonPaste(event)"></textarea>
+                        <div class="reason-hint" id="reserveReasonHint">最多 100 字</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeReserveModal()">取消</button>
+                    <button class="btn-primary" onclick="submitReservation()">确认预约</button>
+                </div>
+            </div>
+        </div>
+        
+        
+    </div>
+    
+    <script th:inline="javascript">
+        window.USER_ID = /*[[${user.studentId}]]*/ '';
+        window.USER_EMAIL = /*[[${user.email}]]*/ '';
+    </script>
+    <script th:src="@{/js/ui-feedback.js(v='20261121a')}"></script>
+    <script th:src="@{/js/student-common.js(v='20261025m2')}"></script>
+    <script th:src="@{/js/student-schedule.js(v='20261120c')}"></script>
+    <script th:src="@{/js/student-profile.js(v='20261025m2')}"></script>
+    <script th:src="@{/js/ai-fetch.js(v='20261025q1')}"></script>
+    <script th:src="@{/js/student-ai.js(v='20261025q1')}"></script>
+    <script th:src="@{/js/student-classes.js(v='20261120a')}"></script>
+    <script th:src="@{/js/student-classroom.js(v='20261120a')}"></script>
+    <script th:src="@{/js/student-class-schedule.js(v='20261025m2')}"></script>
+    <script th:src="@{/js/student-notifications.js(v='20261025m2')}"></script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+/* 统一页面反馈组件：顶部 toast + 模态确认框 + 输入框弹窗
+   依赖 theme.css 的设计变量，变量缺失时有兜底值 */
+
+/* ---------- Toast ---------- */
+#uiToastContainer {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+    max-width: 90vw;
+}
+
+.ui-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    min-width: 200px;
+    max-width: min(560px, 90vw);
+    padding: 11px 18px;
+    border-radius: var(--r-btn, 8px);
+    background: #1F1F1F;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.55;
+    white-space: pre-line;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity .2s ease, transform .2s ease;
+    pointer-events: auto;
+    cursor: default;
+}
+
+.ui-toast.ui-toast-show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.ui-toast.ui-toast-hide {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.ui-toast-icon {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-top: 3px;
+    opacity: .95;
+}
+
+.ui-toast-text {
+    flex: 1 1 auto;
+    word-break: break-word;
+}
+
+.ui-toast-success { background: #2E7D32; }
+.ui-toast-error   { background: #C62828; }
+.ui-toast-warning { background: #B26A00; }
+.ui-toast-info    { background: #1F1F1F; }
+
+/* ---------- 模态确认框 ---------- */
+.ui-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(17, 17, 17, .42);
+    animation: uiOverlayIn .14s ease;
+}
+
+.ui-dialog {
+    width: 100%;
+    max-width: 430px;
+    background: var(--card, #fff);
+    border-radius: var(--r-modal, 12px);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .26);
+    animation: uiDialogIn .18s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.ui-dialog-title {
+    padding: 20px 22px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink, #111);
+    line-height: 1.4;
+}
+
+.ui-dialog-body {
+    padding: 9px 22px 20px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text, #333);
+    white-space: pre-line;
+    word-break: break-word;
+    max-height: 55vh;
+    overflow-y: auto;
+}
+
+.ui-dialog-input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 12px;
+    padding: 9px 12px;
+    border: 1px solid var(--line-strong, #D8D8D4);
+    border-radius: var(--r-btn, 8px);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text, #333);
+    background: #fff;
+    outline: none;
+    transition: border-color .2s ease;
+}
+
+.ui-dialog-input:focus {
+    border-color: var(--btn, #111);
+}
+
+.ui-dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 0 22px 20px;
+}
+
+.ui-dialog-btn {
+    min-width: 78px;
+    padding: 8px 16px;
+    border-radius: var(--r-btn, 8px);
+    font-size: 14px;
+    font-family: inherit;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: var(--ease, all .2s ease);
+    border: 1px solid transparent;
+}
+
+.ui-dialog-cancel {
+    background: #fff;
+    color: var(--text, #333);
+    border-color: var(--line-strong, #D8D8D4);
+}
+
+.ui-dialog-cancel:hover {
+    background: var(--hover, #FAFAF8);
+}
+
+.ui-dialog-ok {
+    background: var(--btn, #111);
+    color: #fff;
+    border-color: var(--btn, #111);
+}
+
+.ui-dialog-ok:hover {
+    background: var(--btn-hover, #333);
+    border-color: var(--btn-hover, #333);
+}
+
+.ui-dialog-ok-danger {
+    background: var(--warn, #C62828);
+    border-color: var(--warn, #C62828);
+}
+
+.ui-dialog-ok-danger:hover {
+    background: #A31F1F;
+    border-color: #A31F1F;
+}
+
+.ui-dialog-btn:focus-visible {
+    outline: 2px solid var(--info, #1565C0);
+    outline-offset: 2px;
+}
+
+@keyframes uiOverlayIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes uiDialogIn {
+    from { opacity: 0; transform: translateY(10px) scale(.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 480px) {
+    #uiToastContainer { top: 14px; }
+    .ui-dialog { max-width: none; }
+    .ui-dialog-footer { flex-direction: column-reverse; }
+    .ui-dialog-btn { width: 100%; }
+}
+
+/* 通用分页条：列表页共用 */
+.ui-pager {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--text-muted, #7a7f87);
+}
+.ui-pager-info { margin-right: auto; }
+.ui-pager-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: #fff;
+    color: inherit;
+    cursor: pointer;
+    font-size: 13px;
+}
+.ui-pager-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.ui-pager-btn:not(:disabled):hover { border-color: var(--accent, #3b6cf6); color: var(--accent, #3b6cf6); }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhixiaogang.mapper.KnowledgeBaseMapper">
+
+    <select id="searchKnowledge" resultType="map">
+        SELECT
+            id,
+            title,
+            content,
+            category,
+            tags,
+            (
+                <foreach collection="words" item="w" separator="+">
+                    (CASE WHEN title LIKE CONCAT('%', #{w}, '%') THEN 3 ELSE 0 END
+                     + CASE WHEN tags LIKE CONCAT('%', #{w}, '%') THEN 2 ELSE 0 END
+                     + CASE WHEN content LIKE CONCAT('%', #{w}, '%') THEN 1 ELSE 0 END)
+                </foreach>
+            ) AS score
+        FROM knowledge_base
+        <where>
+            <foreach collection="words" item="w" separator=" OR ">
+                (title LIKE CONCAT('%', #{w}, '%')
+                 OR tags LIKE CONCAT('%', #{w}, '%')
+                 OR content LIKE CONCAT('%', #{w}, '%'))
+            </foreach>
+        </where>
+        ORDER BY score DESC, id DESC
+        LIMIT 5
+    </select>
+
+</mapper>

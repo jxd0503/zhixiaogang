@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111111'/%3E%3Cpath d='M32 15 L53 24.5 L32 34 L11 24.5 Z' fill='none' stroke='%23ffffff' stroke-width='3.5' stroke-linejoin='round'/%3E%3Cpath d='M21 30 V40 C21 44.5 43 44.5 43 40 V30' fill='none' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3Cpath d='M49 27 V40' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3Ccircle cx='49' cy='43.5' r='2.5' fill='%23ffffff'/%3E%3C/svg%3E"/>
+    <title>错误页面</title>
+    <style>
+        :root {
+            --ink: #111111; --text: #333333; --muted: #666666; --faint: #999999;
+            --line: #E8E8E6; --line-strong: #D8D8D4; --bg: #F5F5F3;
+            --warn: #C62828;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter,
+                "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px;
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+        .error-container {
+            background: #ffffff;
+            padding: 48px 40px;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            max-width: 560px;
+            width: 100%;
+            text-align: center;
+        }
+        .error-icon { margin-bottom: 20px; color: var(--ink); display: flex; justify-content: center; }
+        .error-icon svg { width: 40px; height: 40px; }
+        .error-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 12px;
+        }
+        .error-message {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            word-break: break-all;
+            line-height: 1.7;
+        }
+        .error-url {
+            font-size: 12px;
+            color: var(--faint);
+            margin-bottom: 28px;
+            word-break: break-all;
+        }
+        .back-btn {
+            background: var(--ink);
+            color: #ffffff;
+            padding: 11px 28px;
+            border: 1px solid var(--ink);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .back-btn:hover { background: #333333; border-color: #333333; }
+        @media (max-width: 480px) {
+            .error-container { padding: 36px 24px; }
+            .error-title { font-size: 20px; }
+            .back-btn { width: 100%; height: 48px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h1 class="error-title">服务器内部错误</h1>
+        <p class="error-message" th:text="${error}">未知错误</p>
+        <p class="error-url" th:text="'URL: ' + ${url}">URL: /</p>
+        <button class="back-btn" onclick="window.history.back()">返回上一页</button>
+    </div>
+</body>
+</html>

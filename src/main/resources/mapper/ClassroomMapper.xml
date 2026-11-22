@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhixiaogang.mapper.ClassroomMapper">
+
+    <select id="getAvailableClassrooms" resultType="map">
+        SELECT 
+            id,
+            classroom_no,
+            building,
+            floor,
+            capacity,
+            room_type,
+            status,
+            description
+        FROM classroom
+        WHERE status = 'available'
+        ORDER BY building, floor, classroom_no
+    </select>
+
+    <select id="getClassroomsByBuilding" resultType="map">
+        SELECT 
+            id,
+            classroom_no,
+            building,
+            floor,
+            capacity,
+            room_type,
+            status,
+            description
+        FROM classroom
+        WHERE building = #{building} AND status = 'available'
+        ORDER BY floor, classroom_no
+    </select>
+
+</mapper>

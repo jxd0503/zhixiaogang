@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111111'/%3E%3Cpath d='M32 15 L53 24.5 L32 34 L11 24.5 Z' fill='none' stroke='%23ffffff' stroke-width='3.5' stroke-linejoin='round'/%3E%3Cpath d='M21 30 V40 C21 44.5 43 44.5 43 40 V30' fill='none' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3Cpath d='M49 27 V40' stroke='%23ffffff' stroke-width='3.5' stroke-linecap='round'/%3E%3Ccircle cx='49' cy='43.5' r='2.5' fill='%23ffffff'/%3E%3C/svg%3E"/>
+    <title>智小港 - 注册</title>
+    <style>
+        :root {
+            --ink: #111111; --text: #333333; --muted: #666666; --faint: #999999;
+            --line: #E8E8E6; --line-strong: #D8D8D4; --bg: #F5F5F3;
+            --warn: #C62828; --ok: #2E7D32;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter,
+                "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page-main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 48px 24px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 40px 36px;
+        }
+
+        .brand { margin-bottom: 28px; }
+        .brand .eyebrow {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            color: var(--faint);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .brand h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+        .brand p { font-size: 13px; color: var(--muted); }
+
+        .error-message {
+            background: #ffffff;
+            border: 1px solid rgba(198, 40, 40, 0.35);
+            color: var(--warn);
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .inline-error {
+            display: none;
+            margin-top: 6px;
+            padding: 5px 10px;
+            font-size: 12px;
+            color: var(--warn);
+            background: #ffffff;
+            border: 1px solid rgba(198, 40, 40, 0.35);
+            border-radius: 6px;
+        }
+
+        .success-message {
+            background: #ffffff;
+            border: 1px solid rgba(46, 125, 50, 0.35);
+            color: var(--ok);
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .form-group { margin-bottom: 16px; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            height: 44px;
+            padding: 0 12px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text);
+            background: #ffffff;
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        .form-group input::placeholder { color: #B0B0AE; }
+        .form-group input:focus,
+        .form-group select:focus { border-color: var(--ink); }
+        .form-group select {
+            appearance: none; -webkit-appearance: none; cursor: pointer;
+            padding-right: 34px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+
+        .btn {
+            width: 100%;
+            height: 46px;
+            border: 1px solid var(--ink);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .btn-primary { background: var(--ink); color: #ffffff; }
+        .btn-primary:hover { background: #333333; border-color: #333333; }
+        .btn-primary:disabled { background: #cccccc; border-color: #cccccc; cursor: not-allowed; }
+
+        .agreement {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 18px;
+        }
+        .agreement input { margin-right: 8px; width: 15px; height: 15px; accent-color: var(--ink); cursor: pointer; }
+        .agreement label { margin: 0; cursor: pointer; }
+
+        .links { margin-top: 24px; text-align: center; font-size: 13px; color: var(--muted); }
+        .links a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
+        .links a:hover { color: #333333; }
+
+        .page-footer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--faint);
+            padding: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .page-main { padding: 24px 16px; }
+            .auth-card { padding: 32px 24px; }
+            .brand h1 { font-size: 26px; }
+            .form-group input, .form-group select { height: 48px; }
+            .btn { height: 48px; }
+            .inline-error { line-height: 1.5; word-break: break-all; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-main">
+        <div class="auth-card">
+            <div class="brand">
+                <span class="eyebrow">Smart Campus</span>
+                <h1>智小港</h1>
+                <p>智慧校园AI智能服务平台</p>
+            </div>
+
+            <div th:if="${error}" class="error-message">
+                <span th:text="${error}"></span>
+            </div>
+
+            <form action="/register" method="post" onsubmit="return validateForm()">
+                <div class="form-group">
+                    <label for="studentId">学号</label>
+                    <input type="text" id="studentId" name="studentId" placeholder="请输入学号" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">手机号</label>
+                    <input type="tel" id="phone" name="phone" placeholder="请输入手机号" required>
+                    <span class="inline-error" id="phoneError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" placeholder="请输入密码" required>
+                    <span class="inline-error" id="passwordError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">确认密码</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="请再次输入密码" required>
+                    <span class="inline-error" id="confirmPasswordError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="department">学院</label>
+                    <select id="department" name="department" required>
+                        <option value="">请选择学院</option>
+                        <option value="人工智能学院">人工智能学院</option>
+                        <option value="经济管理学院">经济管理学院</option>
+                        <option value="建筑工程学院">建筑工程学院</option>
+                        <option value="商学院">商学院</option>
+                        <option value="信息学院">信息学院</option>
+                        <option value="艺术学院">艺术学院</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="major">专业</label>
+                    <select id="major" name="major" required>
+                        <option value="">请选择专业</option>
+                        <option value="计算机应用技术">计算机应用技术</option>
+                        <option value="软件技术">软件技术</option>
+                        <option value="计算机网络技术">计算机网络技术</option>
+                        <option value="人工智能">人工智能</option>
+                        <option value="软件工程">软件工程</option>
+                        <option value="会计">会计</option>
+                        <option value="市场营销">市场营销</option>
+                        <option value="建筑工程技术">建筑工程技术</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+
+                <div class="agreement">
+                    <input type="checkbox" id="agreement" required>
+                    <label for="agreement">我已阅读并同意《用户服务协议》</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">注 册</button>
+            </form>
+
+            <div class="links">
+                <p>已有账号？<a href="/login">立即登录</a></p>
+            </div>
+        </div>
+    </div>
+    <footer class="page-footer">© 2026 智小港 · 智慧校园服务平台</footer>
+
+    <script>
+        function showInlineError(elementId, message) {
+            var el = document.getElementById(elementId);
+            el.textContent = message;
+            el.style.display = 'block';
+        }
+
+        function clearInlineErrors() {
+            document.querySelectorAll('.inline-error').forEach(function(el) {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+        }
+
+        function validateForm() {
+            clearInlineErrors();
+            var password = document.getElementById('password').value;
+            var confirmPassword = document.getElementById('confirmPassword').value;
+            var phone = document.getElementById('phone').value;
+            var valid = true;
+
+            if (password.length < 6) {
+                showInlineError('passwordError', '密码长度不能少于6位');
+                valid = false;
+            }
+
+            if (password !== confirmPassword) {
+                showInlineError('confirmPasswordError', '两次输入的密码不一致');
+                valid = false;
+            }
+
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
+                showInlineError('phoneError', '请输入正确的手机号');
+                valid = false;
+            }
+
+            return valid;
+        }
+
+        document.getElementById('password').addEventListener('input', function() {
+            document.getElementById('passwordError').style.display = 'none';
+        });
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            document.getElementById('confirmPasswordError').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
